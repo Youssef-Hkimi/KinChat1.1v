@@ -1,0 +1,11 @@
+node_modules/
+.env
+database.sqlite
+*.log
+scratch.ts
+test.js
+test_get.js
+1783102338837-player-script.js
+1783102338841-player-script.js
+output.txt
+clear-commands.ts

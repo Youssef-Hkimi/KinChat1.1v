@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPC Studio</title>
+    <link rel="stylesheet" href="studio.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- LEFT PANEL: Library -->
+        <aside class="panel panel-left">
+            <div class="panel-header">
+                <h2>🎨 NPC Studio</h2>
+            </div>
+            <div class="library-tools">
+                <button id="btnCreateNpc" class="btn btn-secondary" style="width: 100%">+ Create NPC</button>
+                <input type="text" id="searchLibrary" class="search-input" placeholder="Search NPCs...">
+            </div>
+            <div class="npc-list" id="npcList">
+                <!-- Dynamically populated via studio.js -->
+            </div>
+        </aside>
+
+        <!-- CENTER PANEL: Designer -->
+        <main class="panel panel-center">
+            <div class="panel-header" style="position: sticky; top: 0; background: var(--panel-bg); z-index: 100; border-bottom: 1px solid var(--surface-border);">
+                <h2>NPC Designer</h2>
+                <div>
+                    <span id="saveStatus" style="font-size: 12px; color: var(--text-secondary); margin-right: 12px;">All changes saved</span>
+                    <button id="btnSave" class="btn btn-primary">Save Changes (Ctrl+S)</button>
+                </div>
+            </div>
+
+            <div class="designer-content" id="designerContent">
+                
+                <!-- SECTION 1: Identity -->
+                <div class="section-card expanded" id="sec-identity">
+                    <div class="section-header">
+                        <h3>👤 1. Identity</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>Internal ID (Lowercase, no spaces)</label>
+                            <input type="text" class="form-control" id="f_id" placeholder="shade">
+                        </div>
+                        <div style="display: flex; gap: 16px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Display Name</label>
+                                <input type="text" class="form-control" id="f_name" placeholder="Shade">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Nickname</label>
+                                <input type="text" class="form-control" id="f_nickname" placeholder="The Shadow">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 16px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Pronouns (Optional)</label>
+                                <input type="text" class="form-control" id="f_pronouns" placeholder="he/him">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Short Tagline</label>
+                                <input type="text" class="form-control" id="f_tagline" placeholder="Lurks in the dark.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Occupation</label>
+                            <input type="text" class="form-control" id="f_occupation" placeholder="Assassin">
+                        </div>
+                        <div style="display: flex; gap: 16px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Current Mood</label>
+                                <input type="text" class="form-control" id="f_mood" placeholder="Mysterious">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Age</label>
+                                <input type="text" class="form-control" id="f_age" placeholder="Unknown">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Full Description (Markdown Supported)</label>
+                            <textarea class="form-control" id="f_personalitySummary" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Favorite Quote</label>
+                            <input type="text" class="form-control" id="f_favoriteQuote">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Media -->
+                <div class="section-card" id="sec-media">
+                    <div class="section-header">
+                        <h3>🖼️ 2. Media</h3>
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>Avatar URL</label>
+                            <input type="text" class="form-control" id="f_avatarUrl">
+                        </div>
+                        <div class="form-group">
+                            <label>Banner / Background Artwork URL</label>
+                            <input type="text" class="form-control" id="f_bannerUrl">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Embed Designer -->
+                <div class="section-card" id="sec-embed">
+                    <div class="section-header">
+                        <h3>✨ 3. Embed Designer</h3>
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>Primary Embed Color (Hex)</label>
+                            <input type="text" class="form-control" id="f_embedColor" placeholder="#7289da">
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">More layout options coming soon!</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 9: Favorites -->
+                <div class="section-card" id="sec-favorites">
+                    <div class="section-header">
+                        <h3>❤️ 9. Favorites</h3>
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>Likes (Comma-separated)</label>
+                            <input type="text" class="form-control" id="f_likes">
+                        </div>
+                        <div class="form-group">
+                            <label>Dislikes (Comma-separated)</label>
+                            <input type="text" class="form-control" id="f_dislikes">
+                        </div>
+                        <div class="form-group">
+                            <label>Favorite Food</label>
+                            <input type="text" class="form-control" id="f_favoriteFood">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 10: Lore Editor -->
+                <div class="section-card" id="sec-lore">
+                    <div class="section-header">
+                        <h3>📜 10. Lore Editor</h3>
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>Backstory</label>
+                            <textarea class="form-control" id="f_lore_backstory" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Secrets (Hidden from users)</label>
+                            <textarea class="form-control" id="f_lore_secrets" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Rumors</label>
+                            <textarea class="form-control" id="f_lore_rumors" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 11: Conversation Settings -->
+                <div class="section-card" id="sec-conversation">
+                    <div class="section-header">
+                        <h3>💬 11. Conversation Settings</h3>
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>Verbosity (0: One Word -> 100: Paragraphs)</label>
+                            <div class="slider-group">
+                                <input type="range" id="f_conv_verbosity" min="0" max="100" value="50">
+                                <span id="v_verbosity">50</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Humor Level</label>
+                            <div class="slider-group">
+                                <input type="range" id="f_conv_humor" min="0" max="100" value="50">
+                                <span id="v_humor">50</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Sarcasm</label>
+                            <div class="slider-group">
+                                <input type="range" id="f_conv_sarcasm" min="0" max="100" value="50">
+                                <span id="v_sarcasm">50</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 12: Prompt Builder -->
+                <div class="section-card" id="sec-prompt">
+                    <div class="section-header">
+                        <h3>🧠 12. Prompt Builder</h3>
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label>LLM Base Prompt (Advanced Override)</label>
+                            <textarea class="form-control" id="f_basePrompt" rows="8"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Compiled Prompt Preview (Read Only)</label>
+                            <textarea class="form-control" id="f_compiledPrompt" rows="8" readonly style="background: rgba(0,0,0,0.2);"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Live Preview -->
+        <aside class="panel panel-right">
+            <div class="panel-header">
+                <h2>Live Discord Preview</h2>
+            </div>
+            <div class="preview-toolbar">
+                <button class="btn btn-secondary" style="background: var(--primary-color); border-color: var(--primary-color);">Desktop</button>
+                <button class="btn btn-secondary">Mobile</button>
+                <div style="flex-grow: 1;"></div>
+                <button class="btn btn-secondary">Dark</button>
+            </div>
+            
+            <div class="preview-container">
+                <div class="discord-message">
+                    <div class="discord-avatar">
+                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" style="width:100%; border-radius:50%;" alt="Bot">
+                    </div>
+                    <div class="discord-content">
+                        <div class="discord-author">
+                            <span class="discord-author-name">Disbot</span>
+                            <span class="discord-author-bot">BOT</span>
+                            <span class="discord-timestamp">Today at 12:00 PM</span>
+                        </div>
+                        
+                        <div class="discord-embed" id="pv_embedContainer">
+                            <img id="pv_banner" class="discord-embed-banner" src="" style="display:none;">
+                            <div style="display: flex;">
+                                <div style="flex-grow: 1;">
+                                    <div class="discord-embed-title" id="pv_title">📖 NPC Directory: Shade</div>
+                                    <div class="discord-embed-desc" id="pv_desc">Description goes here</div>
+                                    
+                                    <div class="discord-embed-fields" id="pv_fields" style="margin-top: 12px;">
+                                        <!-- Fields populated dynamically -->
+                                    </div>
+                                </div>
+                                <img id="pv_thumbnail" class="discord-embed-thumbnail" src="" style="display:none;">
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modals & Scripts -->
+    <script src="studio.js"></script>
+</body>
+</html>

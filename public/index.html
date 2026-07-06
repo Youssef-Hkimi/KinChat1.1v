@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Operations Center - Kin Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-theme">
+
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="overlay active">
+        <div class="glass-card login-box">
+            <div class="glow"></div>
+            <h2>Developer Login</h2>
+            <p>Access the Operations Center</p>
+            <input type="password" id="passwordInput" placeholder="Master Password...">
+            <button id="loginBtn" class="btn-primary">Authenticate</button>
+            <p id="loginError" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="dashboard hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <h2>🛠 DevOps Center</h2>
+                <div class="status-indicator">
+                    <span class="dot pulse-green"></span>
+                    <span id="nav-system-status">System Online</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="view-overview">📊 Overview</a>
+                <a href="#" class="nav-item" data-target="view-servers">🌍 Servers</a>
+                <a href="#" class="nav-item" data-target="view-presence">🤖 Bot Presence</a>
+                <a href="#" class="nav-item" data-target="view-activity">⚡ Live Activity</a>
+                <a href="#" class="nav-item" data-target="view-npc">🎭 NPC Editor</a>
+                <a href="#" class="nav-item" data-target="view-partners">🤝 Partner Network</a>
+                <a href="#" class="nav-item" data-target="view-settings">🎨 Global Settings</a>
+                <a href="#" class="nav-item" data-target="view-tools">⚙ Developer Tools</a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>Kin Chat AI v1.0</p>
+                <button id="logoutBtn" class="btn-secondary sm">Logout</button>
+            </div>
+        </aside>
+        
+        <!-- Content Area -->
+        <main class="content-area">
+            
+            <!-- OVERVIEW VIEW -->
+            <section id="view-overview" class="view-section active">
+                <header class="view-header">
+                    <h2>📊 Overview Dashboard</h2>
+                    <p>Real-time telemetry and global KPIs.</p>
+                </header>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card glass-panel">
+                        <h3>Bot Status</h3>
+                        <p class="kpi-value" id="kpi-status">Loading...</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Total Servers</h3>
+                        <p class="kpi-value" id="kpi-servers">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Total Users Reached</h3>
+                        <p class="kpi-value" id="kpi-users">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Messages Processed (Today)</h3>
+                        <p class="kpi-value" id="kpi-messages">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>NPC Replies (Today)</h3>
+                        <p class="kpi-value" id="kpi-replies">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Database Memories</h3>
+                        <p class="kpi-value" id="kpi-memories">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Host Memory Usage</h3>
+                        <p class="kpi-value" id="kpi-memory">0 MB</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Host CPU Load</h3>
+                        <p class="kpi-value" id="kpi-cpu">0.00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SERVERS VIEW -->
+            <section id="view-servers" class="view-section hidden">
+                <header class="view-header">
+                    <h2>🌍 Real-Time Server Tracker</h2>
+                    <p>Monitor all active deployments.</p>
+                    <div class="actions">
+                        <input type="text" id="serverSearch" placeholder="Search servers..." class="search-input">
+                    </div>
+                </header>
+                
+                <div class="glass-panel table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Icon</th>
+                                <th>Server Name</th>
+                                <th>Members</th>
+                                <th>Joined At</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serverTableBody">
+                            <tr><td colspan="5" style="text-align: center;">Loading servers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- BOT PRESENCE VIEW -->
+            <section id="view-presence" class="view-section hidden">
+                <header class="view-header">
+                    <h2>🤖 Bot Presence Editor</h2>
+                    <p>Configure the rotating status playlist for the Discord bot.</p>
+                </header>
+                
+                <div class="glass-panel">
+                    <h3>Current Playlist</h3>
+                    <div id="presencePlaylist" class="playlist-container">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <h3 style="margin-top: 2rem;">Add New Status</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="presStatus">
+                                <option value="online">Online</option>
+                                <option value="idle">Idle</option>
+                                <option value="dnd">Do Not Disturb</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Activity Type</label>
+                            <select id="presType">
+                                <option value="0">Playing</option>
+                                <option value="3">Watching</option>
+                                <option value="2">Listening</option>
+                                <option value="5">Competing</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Status Text</label>
+                            <input type="text" id="presText" placeholder="e.g. with Greg's toolbox">
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (Seconds)</label>
+                            <input type="number" id="presDuration" value="30" min="10">
+                        </div>
+                    </div>
+                    <div class="actions-row" style="margin-top: 1rem;">
+                        <button id="addPresenceBtn" class="btn-secondary">+ Add to Playlist</button>
+                        <button id="savePresenceBtn" class="btn-primary">Save & Apply Playlist</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LIVE ACTIVITY VIEW -->
+            <section id="view-activity" class="view-section hidden">
+                <header class="view-header">
+                    <h2>⚡ Live Activity Monitor</h2>
+                    <p>Real-time event stream from the core engine.</p>
+                    <div class="actions">
+                        <button id="clearActivityBtn" class="btn-secondary sm">Clear Logs</button>
+                    </div>
+                </header>
+                
+                <div class="terminal glass-panel">
+                    <div id="activityFeed" class="feed">
+                        <div class="log-entry system">
+                            <span class="time">System</span>
+                            <span class="message">Awaiting SSE connection...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DEVELOPER TOOLS VIEW -->
+            <section id="view-tools" class="view-section hidden">
+                <header class="view-header danger">
+                    <h2>⚙ Developer Tools</h2>
+                    <p>Danger Zone. System-level operations.</p>
+                </header>
+                
+                <div class="tools-grid">
+                    <div class="tool-card glass-panel danger-border">
+                        <h3>Restart Bot Core</h3>
+                        <p>Terminate the Node process. Process manager must auto-restart it.</p>
+                        <button id="restartBotBtn" class="btn-danger">Execute Restart</button>
+                    </div>
+                    
+                    <div class="tool-card glass-panel">
+                        <h3>Broadcast Announcement</h3>
+                        <p>Send an embed message to the system channel of every server.</p>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Title</label>
+                            <input type="text" id="broadcastTitle" placeholder="📢 System Update">
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea id="broadcastMessage" rows="4" placeholder="Enter announcement text..."></textarea>
+                        </div>
+                        <button id="broadcastBtn" class="btn-primary" style="margin-top: 0.5rem; width: 100%;">Send Broadcast</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- NPC EDITOR VIEW -->
+            <section id="view-npc" class="view-section hidden">
+                <header class="view-header">
+                    <h2>🎭 NPC Editor</h2>
+                    <p>Create and edit AI Persona configurations.</p>
+                    <div class="actions">
+                        <button id="createNpcBtn" class="btn-secondary sm">+ New NPC</button>
+                        <button id="saveNpcBtn" class="btn-primary">Save Changes</button>
+                    </div>
+                </header>
+
+                <div class="npc-layout" style="display: grid; grid-template-columns: 250px 1fr; gap: 1.5rem;">
+                    <!-- NPC List Sidebar -->
+                    <div class="glass-panel" style="padding: 1rem;">
+                        <ul id="npcList" style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 600px; overflow-y: auto;">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Editor Form -->
+                    <div class="glass-panel" id="editorContent" style="display: none;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>NPC ID (Lowercase, no spaces)</label>
+                                <input type="text" id="editId" placeholder="e.g., shade">
+                            </div>
+                            <div class="form-group">
+                                <label>Display Name</label>
+                                <input type="text" id="editName" placeholder="e.g., Shade">
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>LLM Base Prompt</label>
+                                <textarea id="editPrompt" rows="6"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Avatar URL</label>
+                                <input type="text" id="editAvatar">
+                            </div>
+                            <div class="form-group">
+                                <label>Banner URL</label>
+                                <input type="text" id="editBanner">
+                            </div>
+                            <div class="form-group">
+                                <label>Occupation</label>
+                                <input type="text" id="editOccupation">
+                            </div>
+                            <div class="form-group">
+                                <label>Personality Summary</label>
+                                <input type="text" id="editPersonality">
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="text" id="editAge">
+                            </div>
+                            <div class="form-group">
+                                <label>Default Mood</label>
+                                <input type="text" id="editMood">
+                            </div>
+                            <div class="form-group">
+                                <label>Likes (Comma-separated)</label>
+                                <input type="text" id="editLikes">
+                            </div>
+                            <div class="form-group">
+                                <label>Dislikes (Comma-separated)</label>
+                                <input type="text" id="editDislikes">
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Favorite Quote</label>
+                                <input type="text" id="editQuote">
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top:20px; margin-bottom: 10px;">Embed Preview</h3>
+                        <div class="discord-embed-preview">
+                            <img id="previewBanner" class="embed-banner" src="" alt="Banner" style="display:none;">
+                            <div class="embed-content">
+                                <img id="previewAvatar" class="embed-avatar" src="" alt="Avatar" style="display:none;">
+                                <div class="embed-text">
+                                    <h4 id="previewName">NPC Name</h4>
+                                    <p id="previewDesc">Description goes here...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PARTNER NETWORK VIEW -->
+            <section id="view-partners" class="view-section hidden">
+                <header class="view-header">
+                    <h2>🤝 Partner Network</h2>
+                    <p>Community Spotlight CRM & Recommendation Engine</p>
+                    <div class="actions">
+                        <button id="addPartnerBtn" class="btn-secondary sm">+ Add Partner</button>
+                    </div>
+                </header>
+
+                <div class="kpi-grid" style="margin-bottom: 2rem;">
+                    <div class="kpi-card glass-panel">
+                        <h3>Total Partners</h3>
+                        <p class="kpi-value" id="kpi-partner-total">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Active Partners</h3>
+                        <p class="kpi-value" id="kpi-partner-active">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Recommendations Sent</h3>
+                        <p class="kpi-value" id="kpi-partner-recs">0</p>
+                    </div>
+                    <div class="kpi-card glass-panel">
+                        <h3>Clicks Tracker</h3>
+                        <p class="kpi-value" id="kpi-partner-clicks">0</p>
+                    </div>
+                </div>
+
+                <div class="actions" style="margin-bottom: 1rem; display: flex; gap: 10px;">
+                    <input type="text" id="partnerSearch" placeholder="Search partners..." class="search-input" style="flex:1;">
+                    <select id="partnerFilter" class="search-input" style="width: auto;">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+
+                <div id="partnerGrid" class="partner-grid">
+                    <!-- Cards populated by JS -->
+                </div>
+            </section>
+
+            <!-- PARTNER MODAL -->
+            <div id="partnerModal" class="overlay hidden">
+                <div class="glass-card" style="width: 600px; max-width: 90vw; max-height: 90vh; overflow-y: auto;">
+                    <h2 id="partnerModalTitle" style="margin-bottom: 1rem;">Add Partner</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>ID (Lowercase, no spaces)</label>
+                            <input type="text" id="partId">
+                        </div>
+                        <div class="form-group">
+                            <label>Server Name</label>
+                            <input type="text" id="partName">
+                        </div>
+                        <div class="form-group">
+                            <label>Icon URL</label>
+                            <input type="text" id="partIcon">
+                        </div>
+                        <div class="form-group">
+                            <label>Invite Link</label>
+                            <input type="text" id="partInvite">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Short Description</label>
+                            <input type="text" id="partDesc">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" id="partCategory" placeholder="Gaming, Art, etc." list="catList">
+                            <datalist id="catList">
+                                <option value="Gaming"><option value="Art"><option value="Development"><option value="Music"><option value="Roleplay"><option value="Community">
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="partStatus">
+                                <option value="active">Active</option>
+                                <option value="paused">Paused</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label style="display:flex; align-items:center; gap:10px; flex-direction: row; cursor: pointer;">
+                                <input type="checkbox" id="partFeatured" style="width: auto; margin:0;"> 
+                                Featured (Shown more often)
+                            </label>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Internal Notes</label>
+                            <textarea id="partNotes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button id="cancelPartnerBtn" class="btn-secondary">Cancel</button>
+                        <button id="savePartnerBtn" class="btn-primary">Save Partner</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS VIEW -->
+            <section id="view-settings" class="view-section hidden">
+                <header class="view-header">
+                    <h2>🎨 Global Settings</h2>
+                    <p>Modify global configurations for embeds and system colors.</p>
+                </header>
+                
+                <div class="glass-panel" style="max-width: 600px;">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label>Global Embed Color (Hex)</label>
+                        <input type="text" id="globalEmbedColor" placeholder="#82FC7E">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label>Global Footer Text</label>
+                        <input type="text" id="globalFooterText" placeholder="Interactive NPC System">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:flex; align-items:center; gap:10px; flex-direction: row; cursor: pointer;">
+                            <input type="checkbox" id="globalShowBanners" style="width: auto; margin:0;"> 
+                            Show Large Banners in /npcs command
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:flex; align-items:center; gap:10px; flex-direction: row; cursor: pointer;">
+                            <input type="checkbox" id="globalShowThumbnails" style="width: auto; margin:0;"> 
+                            Show Thumbnails in /npcs command
+                        </label>
+                    </div>
+                    <button id="saveSettingsBtn" class="btn-primary" style="margin-top: 1rem;">Save Global Settings</button>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
