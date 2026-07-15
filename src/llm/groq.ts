@@ -17,26 +17,55 @@ export interface ChatMessage {
 export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Promise<string | null> {
     try {
         let chatCompletion;
+        const apiKey = process.env.GROQ_API_KEY || '';
+        
         try {
-            chatCompletion = await groq.chat.completions.create({
-                messages: messages as any,
-                model: "llama-3.3-70b-versatile",
-                temperature: 0.9,
-                presence_penalty: 0.6,
-                frequency_penalty: 0.8,
-                max_tokens: 150,
-            }, { timeout: 8000, maxRetries: 0 }); // 8 second timeout
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: messages,
+                    model: "llama-3.3-70b-versatile",
+                    temperature: 0.9,
+                    presence_penalty: 0.6,
+                    frequency_penalty: 0.8,
+                    max_tokens: 150,
+                }),
+                signal: AbortSignal.timeout(8000)
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status} ${text}`);
+            }
+            chatCompletion = await response.json();
         } catch (err: any) {
-            // Fallback to a much faster, higher rate-limit model if the main model times out or rate limits
             console.log("Fallback triggered due to:", err.message);
-            chatCompletion = await groq.chat.completions.create({
-                messages: messages as any,
-                model: "llama-3.1-8b-instant",
-                temperature: 0.9,
-                presence_penalty: 0.6,
-                frequency_penalty: 0.8,
-                max_tokens: 150,
-            }, { timeout: 8000, maxRetries: 1 });
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: messages,
+                    model: "llama-3.1-8b-instant",
+                    temperature: 0.9,
+                    presence_penalty: 0.6,
+                    frequency_penalty: 0.8,
+                    max_tokens: 150,
+                }),
+                signal: AbortSignal.timeout(8000)
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status} ${text}`);
+            }
+            chatCompletion = await response.json();
         }
 
         const content = chatCompletion.choices[0]?.message?.content || "*remains silent*";
