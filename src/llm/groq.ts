@@ -20,15 +20,17 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
         const apiKey = process.env.GROQ_API_KEY || '';
         
         try {
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': 'https://kinchat.com',
+                    'X-Title': 'KinChat',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "llama-3.3-70b-versatile",
+                    model: "meta-llama/llama-3.1-8b-instruct:free",
                     temperature: 0.9,
                     presence_penalty: 0.6,
                     frequency_penalty: 0.8,
@@ -44,15 +46,17 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
             chatCompletion = await response.json();
         } catch (err: any) {
             console.log("Fallback triggered due to:", err.message);
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': 'https://kinchat.com',
+                    'X-Title': 'KinChat',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "llama-3.1-8b-instant",
+                    model: "meta-llama/llama-3.1-8b-instruct:free",
                     temperature: 0.9,
                     presence_penalty: 0.6,
                     frequency_penalty: 0.8,
