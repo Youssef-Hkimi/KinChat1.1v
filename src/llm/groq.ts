@@ -30,13 +30,13 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "openrouter/free",
+                    model: "meta-llama/llama-3.2-3b-instruct:free",
                     temperature: 0.9,
                     presence_penalty: 0.6,
                     frequency_penalty: 0.8,
                     max_tokens: 150,
                 }),
-                signal: AbortSignal.timeout(8000)
+                signal: AbortSignal.timeout(15000)
             });
 
             if (!response.ok) {
@@ -62,7 +62,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
                     frequency_penalty: 0.8,
                     max_tokens: 150,
                 }),
-                signal: AbortSignal.timeout(8000)
+                signal: AbortSignal.timeout(15000)
             });
 
             if (!response.ok) {
