@@ -20,7 +20,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
         try {
             chatCompletion = await groq.chat.completions.create({
                 messages: messages as any,
-                model: "llama3-70b-8192",
+                model: "llama-3.3-70b-versatile",
                 temperature: 0.9,
                 presence_penalty: 0.6,
                 frequency_penalty: 0.8,
@@ -31,7 +31,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
             console.log("Fallback triggered due to:", err.message);
             chatCompletion = await groq.chat.completions.create({
                 messages: messages as any,
-                model: "llama3-8b-8192",
+                model: "llama-3.1-8b-instant",
                 temperature: 0.9,
                 presence_penalty: 0.6,
                 frequency_penalty: 0.8,
