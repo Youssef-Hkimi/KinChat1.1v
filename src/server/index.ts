@@ -9,7 +9,7 @@ import { registerApiRoutes } from './routes';
 
 export function startWebServer(client: Client) {
     const app = express();
-    const port = 3000;
+    const port = process.env.SERVER_PORT || process.env.PORT || 3000;
 
     app.use(cors());
     app.use(express.json());
