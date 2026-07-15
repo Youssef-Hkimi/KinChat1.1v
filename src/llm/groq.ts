@@ -1,4 +1,3 @@
-import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 import { NPC } from '../npcs/index';
 import { sseManager } from '../server/sse';
@@ -6,10 +5,6 @@ import { sseManager } from '../server/sse';
 dotenv.config();
 
 const apiKey = process.env.CEREBRAS_API_KEY || 'csk-fcy32ffnwch8wpe3f5r33jw2yjdr88c53f26fy4fetyf3np8';
-const groq = new Groq({
-    apiKey: apiKey,
-    baseURL: 'https://api.cerebras.ai/v1'
-});
 
 export interface ChatMessage {
     role: 'system' | 'user' | 'assistant';
@@ -20,24 +15,52 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
     try {
         let chatCompletion;
         try {
-            chatCompletion = await groq.chat.completions.create({
-                messages: messages as any,
-                model: "gemma-4-31b",
-                temperature: 0.9,
-                presence_penalty: 0.6,
-                frequency_penalty: 0.8,
-                max_tokens: 150,
-            }, { timeout: 8000, maxRetries: 0 }); // 8 second timeout
+            const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: messages,
+                    model: "gemma-4-31b",
+                    temperature: 0.9,
+                    presence_penalty: 0.6,
+                    frequency_penalty: 0.8,
+                    max_tokens: 150,
+                }),
+                signal: AbortSignal.timeout(8000)
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status} ${text}`);
+            }
+            chatCompletion = await response.json();
         } catch (err: any) {
             console.log("Fallback triggered due to:", err.message);
-            chatCompletion = await groq.chat.completions.create({
-                messages: messages as any,
-                model: "zai-glm-4.7",
-                temperature: 0.9,
-                presence_penalty: 0.6,
-                frequency_penalty: 0.8,
-                max_tokens: 150,
-            }, { timeout: 8000, maxRetries: 1 });
+            const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: messages,
+                    model: "zai-glm-4.7",
+                    temperature: 0.9,
+                    presence_penalty: 0.6,
+                    frequency_penalty: 0.8,
+                    max_tokens: 150,
+                }),
+                signal: AbortSignal.timeout(8000)
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status} ${text}`);
+            }
+            chatCompletion = await response.json();
         }
 
         const content = chatCompletion.choices[0]?.message?.content || "*remains silent*";
