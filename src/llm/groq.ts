@@ -30,7 +30,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "meta-llama/llama-3.3-70b-instruct:free",
+                    model: "openrouter/free",
                     temperature: 0.9,
                     presence_penalty: 0.6,
                     frequency_penalty: 0.8,
@@ -56,7 +56,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "meta-llama/llama-3.2-3b-instruct:free",
+                    model: "openrouter/free",
                     temperature: 0.9,
                     presence_penalty: 0.6,
                     frequency_penalty: 0.8,
