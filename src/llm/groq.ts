@@ -5,8 +5,10 @@ import { sseManager } from '../server/sse';
 
 dotenv.config();
 
+const apiKey = process.env.CEREBRAS_API_KEY || 'csk-fcy32ffnwch8wpe3f5r33jw2yjdr88c53f26fy4fetyf3np8';
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY || ''
+    apiKey: apiKey,
+    baseURL: 'https://api.cerebras.ai/v1'
 });
 
 export interface ChatMessage {
@@ -20,18 +22,17 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
         try {
             chatCompletion = await groq.chat.completions.create({
                 messages: messages as any,
-                model: "llama-3.3-70b-versatile",
+                model: "gemma-4-31b",
                 temperature: 0.9,
                 presence_penalty: 0.6,
                 frequency_penalty: 0.8,
                 max_tokens: 150,
             }, { timeout: 8000, maxRetries: 0 }); // 8 second timeout
         } catch (err: any) {
-            // Fallback to a much faster, higher rate-limit model if the main model times out or rate limits
             console.log("Fallback triggered due to:", err.message);
             chatCompletion = await groq.chat.completions.create({
                 messages: messages as any,
-                model: "llama-3.1-8b-instant",
+                model: "zai-glm-4.7",
                 temperature: 0.9,
                 presence_penalty: 0.6,
                 frequency_penalty: 0.8,
