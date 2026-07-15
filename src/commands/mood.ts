@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { NPCS } from '../npcs';
+import { NPCS } from '../npcs/index';
 
 export const data = new SlashCommandBuilder()
     .setName('mood')

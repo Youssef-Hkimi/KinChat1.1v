@@ -1,5 +1,5 @@
 import { Message, TextChannel, Webhook, EmbedBuilder } from 'discord.js';
-import { NPC, NPCS } from '../npcs';
+import { NPC, NPCS } from '../npcs/index';
 import { getAffinity, updateAffinity, getGuildSettings, hasUserInteracted, getUserHintStatus, updateUserHintStatus } from '../memory/db';
 import { generateNPCResponse, ChatMessage } from '../llm/groq';
 import { sendAsNPC } from '../utils/webhookManager';
@@ -266,11 +266,17 @@ Response Length Rules:
     } else {
         communityContext = 'COMMUNITY TONE: Standard. Balanced humor, normal conversations. Sarcasm and mild edginess are okay if it fits your character.';
     }
+    const isBlackjackChallenge = content.match(/\b(play|wanna play|let's play|lets play)\b.*\b(blackjack|bj|cards)\b/i) || content.match(/\b(blackjack|bj)\b/i);
+    let gameContext = '';
+    if (isBlackjackChallenge) {
+        gameContext = 'The user has challenged you to a game of blackjack. Enthusiastically accept their challenge in 1 short sentence! Do NOT decline. DO NOT offer a counter-offer. Just say YES and show your excitement!';
+    }
 
     const systemPrompt = `${chosenNpc.basePrompt}
 ${globalLengthRules}
 ${communityContext}
 ${dossierContext}
+${gameContext}
 
 --- WORLD CONTEXT ---
 Your Current Activity: ${currentStatus.activity}
@@ -316,7 +322,17 @@ ${nicknameContext}
         
         const finalResponse = `> **${message.author.username}:** ${quotedText}\n${response}`;
 
-        await sendAsNPC(message.channel as TextChannel, chosenNpc, finalResponse);
+        try {
+            await sendAsNPC(message.channel as TextChannel, chosenNpc, finalResponse);
+        } catch (error) {
+            console.error(`Failed to send webhook message for ${chosenNpc.name}:`, error);
+            return;
+        }
+
+        if (isBlackjackChallenge) {
+            const { startBlackjackGame } = require('../commands/blackjack');
+            await startBlackjackGame(message, message.author, chosenNpc);
+        }
 
         cooldownManager.recordReply(message.guildId, chosenNpc.id, message.channelId);
         await statisticsManager.recordNpcReply(message.guildId, chosenNpc.id);

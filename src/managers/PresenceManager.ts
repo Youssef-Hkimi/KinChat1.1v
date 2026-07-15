@@ -1,6 +1,6 @@
 import { Client, TextChannel } from 'discord.js';
 import { getDb } from '../memory/db';
-import { NPCS } from '../npcs';
+import { NPCS } from '../npcs/index';
 import { sendAsNPC } from '../utils/webhookManager';
 import { settingsManager } from './SettingsManager';
 

@@ -83,6 +83,12 @@ export async function initMemory() {
             value TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS UserEconomy (
+            userId TEXT PRIMARY KEY,
+            balance INTEGER DEFAULT 0,
+            lastBankruptcy TEXT DEFAULT ''
+        );
+
         CREATE TABLE IF NOT EXISTS PartnerNetwork (
             id TEXT PRIMARY KEY,
             name TEXT,
@@ -107,6 +113,12 @@ export async function initMemory() {
         CREATE TABLE IF NOT EXISTS UserPreferences (
             userId TEXT PRIMARY KEY,
             recommendationsEnabled BOOLEAN DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS UserEconomy (
+            userId TEXT PRIMARY KEY,
+            balance INTEGER DEFAULT 5000,
+            lastBankruptcy TEXT DEFAULT ''
         );
     `);
 
@@ -365,5 +377,57 @@ export async function setGlobalSetting(key: string, value: string) {
         `INSERT INTO GlobalSettings (key, value) VALUES (?, ?)
          ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
         [key, value]
+    );
+}
+
+export interface UserEconomy {
+    userId: string;
+    balance: number;
+    lastBankruptcy: string;
+}
+
+export async function getUserEconomy(userId: string): Promise<UserEconomy> {
+    const row = await db.get('SELECT * FROM UserEconomy WHERE userId = ?', [userId]);
+    let eco = row as UserEconomy;
+    
+    if (!eco) {
+        eco = { userId, balance: 5000, lastBankruptcy: '' };
+        await db.run('INSERT INTO UserEconomy (userId, balance, lastBankruptcy) VALUES (?, ?, ?)', [eco.userId, eco.balance, eco.lastBankruptcy]);
+        return eco;
+    }
+    
+    // Check bankruptcy reset
+    if (eco.balance <= 0 && eco.lastBankruptcy) {
+        const bankruptcyDate = new Date(eco.lastBankruptcy);
+        const now = new Date();
+        const diffMs = now.getTime() - bankruptcyDate.getTime();
+        // 1 hour = 3600000 ms
+        if (diffMs >= 3600000) {
+            eco.balance = 5000;
+            eco.lastBankruptcy = '';
+            await db.run('UPDATE UserEconomy SET balance = ?, lastBankruptcy = ? WHERE userId = ?', [eco.balance, eco.lastBankruptcy, userId]);
+        }
+    }
+    
+    return eco;
+}
+
+export async function updateUserEconomy(userId: string, balanceChange: number) {
+    const eco = await getUserEconomy(userId);
+    eco.balance += balanceChange;
+    
+    if (eco.balance <= 0) {
+        eco.balance = 0; // Don't go negative
+        // Only set bankruptcy date if they just went bankrupt
+        if (!eco.lastBankruptcy) {
+            eco.lastBankruptcy = new Date().toISOString();
+        }
+    } else {
+        eco.lastBankruptcy = ''; // Reset bankruptcy if they are above 0 (e.g. from a gift)
+    }
+    
+    await db.run(
+        `UPDATE UserEconomy SET balance = ?, lastBankruptcy = ? WHERE userId = ?`,
+        [eco.balance, eco.lastBankruptcy, userId]
     );
 }

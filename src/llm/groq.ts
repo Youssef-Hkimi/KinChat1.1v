@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
-import { NPC } from '../npcs';
+import { NPC } from '../npcs/index';
 import { sseManager } from '../server/sse';
 
 dotenv.config();
@@ -40,6 +40,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
         }
 
         const content = chatCompletion.choices[0]?.message?.content || "*remains silent*";
+        console.log(`[LLM OUTPUT - ${npc.name}]:`, content);
         sseManager.broadcast('activity', { type: 'llm', message: `Groq generated response for ${npc.name}` });
         
         // If the model decides not to reply, it should return NO_REPLY

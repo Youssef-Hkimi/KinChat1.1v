@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, AutocompleteInteraction } from 'discord.js';
-import { NPCS } from '../npcs';
+import { NPCS } from '../npcs/index';
 import { getAffinity } from '../memory/db';
 
 export const data = new SlashCommandBuilder()

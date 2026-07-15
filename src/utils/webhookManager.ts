@@ -1,5 +1,5 @@
 import { TextChannel, WebhookClient } from 'discord.js';
-import { NPC } from '../npcs';
+import { NPC } from '../npcs/index';
 
 export async function sendAsNPC(channel: TextChannel, npc: NPC, content: string) {
     try {

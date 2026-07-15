@@ -11,6 +11,18 @@ import { settingsManager } from './managers/SettingsManager';
 import { getCommandMention } from './utils/commandHelper';
 import { sseManager } from './server/sse';
 
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION:', err);
+    require('fs').appendFileSync('crash.log', 'UNCAUGHT EXCEPTION: ' + err.stack + '\n');
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('UNHANDLED REJECTION:', reason);
+    require('fs').appendFileSync('crash.log', 'UNHANDLED REJECTION: ' + (reason instanceof Error ? reason.stack : reason) + '\n');
+    process.exit(1);
+});
+
 dotenv.config();
 
 const client = new Client({
@@ -64,7 +76,10 @@ client.once('ready', async () => {
 
 
 client.on('messageCreate', (message) => {
-    handleMessage(message).catch(console.error);
+    if (!message.author.bot) {
+        console.log(`[MESSAGE RECEIVED] ${message.author.username}: ${message.content}`);
+    }
+    handleMessage(message).catch(e => console.error("[HANDLE ERROR]:", e));
 });
 
 client.on('interactionCreate', async interaction => {
@@ -76,7 +91,11 @@ client.on('interactionCreate', async interaction => {
                   .setColor('#facc15')
                   .setTitle('🚧 Setup Required')
                   .setDescription(`This server hasn't completed setup yet.\n\nAn administrator can finish setup using the ${getCommandMention(interaction.client, 'setup')} command.`);
-              await interaction.reply({ embeds: [embed], ephemeral: true });
+              try {
+                  await interaction.reply({ embeds: [embed], ephemeral: true });
+              } catch (e) {
+                  console.error("Failed to send setup required message:", e);
+              }
               return;
           }
       }
@@ -87,11 +106,15 @@ client.on('interactionCreate', async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-          await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-        } else {
-          await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        console.error("Command execution error:", error);
+        try {
+            if (interaction.replied || interaction.deferred) {
+              await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+            } else {
+              await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
+        } catch (replyError) {
+            console.error("Failed to send error message to user:", replyError);
         }
       }
   } else if (interaction.isButton()) {

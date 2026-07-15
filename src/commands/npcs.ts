@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ColorResolvable } from 'discord.js';
-import { NPCS } from '../npcs';
+import { NPCS } from '../npcs/index';
 import fs from 'fs';
 import path from 'path';
 

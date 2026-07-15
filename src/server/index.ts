@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import { NPCS, saveNPCs, loadNPCs } from '../npcs';
+import { NPCS, saveNPCs, loadNPCs } from '../npcs/index';
 import { Client } from 'discord.js';
 import { sseManager } from './sse';
 import { registerApiRoutes } from './routes';
