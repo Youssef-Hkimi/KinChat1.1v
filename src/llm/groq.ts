@@ -59,7 +59,13 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
             chatCompletion = await response.json();
         }
 
-        const content = chatCompletion.choices[0]?.message?.content || "*remains silent*";
+        const content = chatCompletion.choices[0]?.message?.content;
+        
+        if (!content || content.trim() === '') {
+            console.log(`[LLM OUTPUT - ${npc.name}]: *remains silent* (Empty response)`);
+            return null; // Return null so the bot doesn't actually type anything
+        }
+
         console.log(`[LLM OUTPUT - ${npc.name}]:`, content);
         sseManager.broadcast('activity', { type: 'llm', message: `Groq generated response for ${npc.name}` });
         
