@@ -23,7 +23,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "llama3.1-70b",
+                    model: "gemma-4-31b",
                     temperature: 0.9,
                     max_tokens: 150,
                 }),
@@ -45,7 +45,7 @@ export async function generateNPCResponse(npc: NPC, messages: ChatMessage[]): Pr
                 },
                 body: JSON.stringify({
                     messages: messages,
-                    model: "llama3.1-8b",
+                    model: "zai-glm-4.7",
                     temperature: 0.9,
                     max_tokens: 150,
                 }),
