@@ -10,6 +10,7 @@ import { botPresenceManager } from './managers/BotPresenceManager';
 import { settingsManager } from './managers/SettingsManager';
 import { getCommandMention } from './utils/commandHelper';
 import { sseManager } from './server/sse';
+import { partnerManager } from './managers/PartnerManager';
 
 process.on('uncaughtException', (err) => {
     console.error('UNCAUGHT EXCEPTION:', err);
@@ -176,6 +177,8 @@ client.on('guildCreate', async (guild) => {
         const owner = await guild.fetchOwner();
         if (owner) {
             await owner.send({ embeds: [embed] }).catch(() => {});
+            // Send the partner spotlight DM to the server owner as part of the welcome
+            partnerManager.sendSpotlightDM(owner.user).catch(e => console.error("Spotlight DM Failed", e));
         }
     } catch (e) {
         console.error('Failed to DM owner', e);

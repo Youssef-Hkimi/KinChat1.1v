@@ -118,19 +118,37 @@ class PartnerManager {
             // Build Embed
             const embed = new EmbedBuilder()
                 .setTitle('<a:sparkle:1523677013183828059> Community Spotlight')
-                .setDescription("While you're here, check out some amazing Discord communities from our trusted partners!\n\n<:safe:1523677087796432999> **Safe Community Promise**\nWe only partner with communities that meet our quality guidelines. Our goal is to recommend welcoming communities that provide a positive experience.\n\n*(Recommendations rotate automatically. Use `/preferences` to disable)*")
-                .setColor('#22fd17')
-                .setThumbnail('https://cdn3.emoji.gg/emojis/937928-alien-yap.gif');
+                .setDescription("While you're here, check out some amazing Discord communities from our trusted partners!\n\n<:safe:1523677087796432999> **Safe Community Promise**\nWe only partner with communities that meet our quality guidelines. Our goal is to recommend welcoming communities that provide a positive experience.")
+                .setColor('#FFD700') // Gold color for spotlight
+                .setThumbnail('https://cdn3.emoji.gg/emojis/937928-alien-yap.gif')
+                .setImage('https://media.discordapp.net/attachments/1522654547862880266/1523412393701671082/New_Project_1.png?ex=6a4c03da&is=6a4ab25a&hm=6be8a8eae8668214e416bd787986dc5a2eb6c1be42a0a854b785845b82f6c2e7&=&format=webp&quality=lossless')
+                .setFooter({ text: 'Recommendations rotate automatically. Use /preferences to disable.' })
+                .setTimestamp();
 
-            // Format raw text content for the invites so Discord unfurls them natively
-            let content = `Here are today's recommendations:\n`;
+            const row = new ActionRowBuilder<ButtonBuilder>();
+
             chosen.forEach(p => {
-                content += `\n**${p.name}** — ${p.category}\n*${p.desc}*\n${p.invite}\n`;
+                embed.addFields({ name: `✨ ${p.name} — ${p.category}`, value: p.desc });
+                
+                // Add a link button for each partner
+                // Discord requires URLs to have a valid protocol, assume https:// if missing
+                let url = p.invite;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                     // usually Discord invites are https://discord.gg/...
+                     url = `https://${url}`;
+                }
+
+                row.addComponents(
+                    new ButtonBuilder()
+                        .setLabel(`Join ${p.name}`)
+                        .setStyle(ButtonStyle.Link)
+                        .setURL(url)
+                );
             });
 
             // Send DM
             const dmChannel = await user.createDM();
-            await dmChannel.send({ content: content, embeds: [embed] });
+            await dmChannel.send({ embeds: [embed], components: [row] });
 
         } catch (e) {
             // Silently fail if DMs are closed
