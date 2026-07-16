@@ -10,7 +10,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const inviteUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`;
     
     const embed = new EmbedBuilder()
-        .setColor('#FF007F')
+        .setColor('#00FF00')
         .setTitle('✨ Invite Kin Chat to Your Server! ✨')
         .setDescription('Bring your server to life with dynamic AI NPCs, immersive roleplay, and natural conversations!\n\nClick the button below to add me to your server.')
         .setThumbnail('https://cdn3.emoji.gg/emojis/26386-mufflien-spacecat.png')

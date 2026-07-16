@@ -157,7 +157,7 @@ client.on('guildCreate', async (guild) => {
     ) as TextChannel | undefined;
 
     const embed = new EmbedBuilder()
-      .setColor('#5865F2')
+      .setColor('#00FF00')
       .setTitle('👋 Thanks for adding Kin Chat!')
       .setDescription(`I am an AI-powered Discord bot that brings your server to life with dynamic NPCs and natural conversations.\n\n**To get started, an Administrator must run the ${getCommandMention(client, 'setup')} command to configure the bot.**`)
       .setThumbnail('https://cdn3.emoji.gg/emojis/26386-mufflien-spacecat.png')
