@@ -32,8 +32,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         if (i.customId === 'partner_kamii') {
             const kamiiEmbed = new EmbedBuilder()
                 .setTitle('Kamii Bot')
-                .setDescription(`Kamii is a all in one easy to use security bot for discord. \nWith lots of features\n\n**Website:** [sakurakamii.cc](https://sakurakamii.cc/)\n**TopGG:** [top.gg/bot/1487082333415673967](https://top.gg/bot/1487082333415673967)\n**Support Server:** [discord.gg/mXvC5zmptZ](https://discord.gg/mXvC5zmptZ)`)
-                .setColor('#ff9cf8') // Pink color matching Sakura theme
+                .setDescription(`Kamii is a all in one easy to use security bot for discord. \nWith lots of features\n\n**Website:** **[sakurakamii.cc](https://sakurakamii.cc/)**\n**TopGG:** **https://top.gg/bot/1487082333415673967**\n**Support Server:** **https://discord.gg/mXvC5zmptZ**`)
+                .setColor('#8B0000') // Dark red to match Kamii icon
                 .setThumbnail('https://cdn.discordapp.com/emojis/1527611919425343558.webp?size=128&quality=lossless')
                 .addFields(
                     { name: '🔔 Sekur-Noti', value: 'Be part of a web of servers helping each other to remain safe. Receive security alerts, get notified when troublemakers join your server - Its all Sekur-Noti is about' },
