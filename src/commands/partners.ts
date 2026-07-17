@@ -39,7 +39,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         if (i.customId === 'partner_kamii') {
             const kamiiEmbed = new EmbedBuilder()
                 .setTitle('Kamii Bot')
-                .setDescription(`Kamii is an all in one easy to use security bot for discord. \nWith lots of features\n\n**Website:** **[sakurakamii.cc](https://sakurakamii.cc/)**\n**Support Server:** **[discord.gg/mXvC5zmptZ](https://discord.gg/mXvC5zmptZ)**`)
+                .setDescription(`Kamii is an all in one easy to use security bot for discord. \nWith lots of features\n\n**Website:** **https://sakurakamii.cc/**\n**Support Server:** **https://discord.gg/mXvC5zmptZ**`)
                 .setColor('#8B0000') // Dark red to match Kamii icon
                 .setThumbnail('https://cdn.discordapp.com/emojis/1527611919425343558.webp?size=128&quality=lossless')
                 .addFields(
