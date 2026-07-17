@@ -65,7 +65,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
             // Send the public ad in the channel. 
             // We put the TopGG link in the content so Discord renders the "weblink image thumbnail" automatically below the embed.
-            publicMsg = await i.channel!.send({ 
+            publicMsg = await (i.channel as any).send({ 
                 content: `<@${i.user.id}> is viewing our partner **Kamii Bot**!\n**TopGG:** https://top.gg/bot/1487082333415673967`,
                 embeds: [kamiiEmbed], 
                 components: [backRow] 
